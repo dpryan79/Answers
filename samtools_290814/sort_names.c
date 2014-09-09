@@ -125,8 +125,8 @@ int main(int argc, char *argv[]) {
     //Free things
     for(i=0; i<=tmp_file_num; i++) {
         fclose(tmp_files[i]);
-//        sprintf(tmp_file_name, "tmp_file.%04i", (int) i);
-//        unlink(tmp_file_name);
+        sprintf(tmp_file_name, "tmp_file.%04i", (int) i);
+        unlink(tmp_file_name);
     }
     free(lines);
     free(tmp_file_name);
