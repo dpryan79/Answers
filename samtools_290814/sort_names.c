@@ -1,3 +1,4 @@
+//gcc -g -O3 -I/home/ryand/include -L/home/ryand/lib -o sort_names sort_names.c -lhts
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <stdio.h>
@@ -36,6 +37,7 @@ int main(int argc, char *argv[]) {
     bam_hdr_t *header = bam_hdr_init();
     FILE *tmp_file = NULL, **tmp_files = NULL;
     char *tmp_file_name = malloc(1024 * sizeof(char));
+    char *last = malloc(1024 * sizeof(char));
     char **rnames, **lines;
     size_t j = 0, i = 0, tmp_file_num = 0, maxsize = 10000000;
     size_t nfinished = 0;
@@ -84,7 +86,6 @@ int main(int argc, char *argv[]) {
     hts_close(fp);
     fclose(tmp_file);
 
-    tmp_file_num = 122;
     //Open tmp files
     tmp_files = malloc(sizeof(FILE*) * tmp_file_num);
     lines = malloc(sizeof(char *) * tmp_file_num);
@@ -112,18 +113,23 @@ int main(int argc, char *argv[]) {
             }
             if(strnum_cmp((void *) (lines+to_print), (void *) (lines+i)) > 0) to_print = i;
         }
-        printf("%s\n", lines[to_print]);
-        if(fgets(lines[to_print], 1024, tmp_files[to_print]) == NULL) {
-            free(lines[to_print]);
-            lines[to_print] = NULL;
-            nfinished++;
-        } else {
-            *(lines[to_print] + strlen(lines[to_print])-1) = '\0'; //Trim \n
+        memcpy(last, lines[to_print], sizeof(char) * (strlen(lines[to_print])+1));
+        //Repeat for multimappers and paired-end reads
+        while(strcmp(last, lines[to_print]) == 0) {
+            printf("%s\n", lines[to_print]);
+            if(fgets(lines[to_print], 1024, tmp_files[to_print]) == NULL) {
+                free(lines[to_print]);
+                lines[to_print] = NULL;
+                nfinished++;
+                break;
+            } else {
+                *(lines[to_print] + strlen(lines[to_print])-1) = '\0'; //Trim \n
+            }
         }
     }
 
     //Free things
-    for(i=0; i<=tmp_file_num; i++) {
+    for(i=0; i<tmp_file_num; i++) {
         fclose(tmp_files[i]);
         sprintf(tmp_file_name, "tmp_file.%04i", (int) i);
         unlink(tmp_file_name);

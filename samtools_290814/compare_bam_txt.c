@@ -54,17 +54,20 @@ int main(int argc, char *argv[]) {
             if(fgets(line, 1024, fp_txt) == NULL) break;
             *(line+strlen(line)-1) = '\0';
         } else if(rv>0) {
-            printf("BAM file is missing %s\n", line); fflush(stdout);
-            if(fgets(line, 1024, fp_txt) == NULL) break;
-            *(line+strlen(line)-1) = '\0';
-        } else {
-            printf("TXT file is missing %s\n", qname); fflush(stdout);
+            fprintf(stderr, "[TXT missing] Expected %s but found %s\n", line, qname); fflush(stderr);
+            printf("[TXT missing] Expected %s but found %s\n", line, qname); fflush(stdout);
             if(bam_read1(fp_bam->fp.bgzf, read)  <= 4) break;
             qname = bam_get_qname(read);
+        } else { //rv<0
+            fprintf(stderr, "[BAM missing] Expected %s but found %s\n", line, qname); fflush(stderr);
+            printf("[BAM missing] Expected %s but found %s\n", line, qname); fflush(stdout);
+            if(fgets(line, 1024, fp_txt) == NULL) break;
+            *(line+strlen(line)-1) = '\0';
         }
     }
 
-    while(bam_read1(fp_bam->fp.bgzf, read) != 0) {
+/*
+    while(bam_read1(fp_bam->fp.bgzf, read) > 4) {
         qname = bam_get_qname(read);
         printf("TXT file is missing %s\n", qname); fflush(stdout);
     }
@@ -72,6 +75,7 @@ int main(int argc, char *argv[]) {
         *(line+strlen(line)-1) = '\0';
         printf("BAM file is missing %s\n", line); fflush(stdout);
     }
+*/
 
     bam_hdr_destroy(header);
     bam_destroy1(read);
