@@ -45,10 +45,13 @@ def get_alignment(line):
     col = line.split('\t')
     if sam_format:
         if line[0] == '@': return []
-        flag = col[1] 
-        if 'u' in flag: return []
-        if options.unique and 's' in flag: return []
-        if options.pair and 'P' not in flag: return []
+        flag = int(col[1])
+        if(flag & 4): #Unmapped record
+            return []
+        if(options.unique and flag&256==0) : #Secondary alignment
+            return []
+        if(options.pair and flag&1==1 and flag&2!=2) : #Non-properly paired PE alignment
+            return []
         cr, pos, cigar, seq, strand, insert = col[2], int(col[3])-1, col[5], col[9], '', int(col[8])
         if cr not in options.chroms: return []
         strand_index = line.find('ZS:Z:')
@@ -116,9 +119,9 @@ BS_conversion = {'+': ('C','T','G','A'), '-': ('G','A','C','T')}
 nmap = 0
 for infile in infiles:
     nline = 0
-    if infile.strip() == '-': sam_format, fin, infile = True, os.popen('%ssamtools view -XSh -' % options.sam_path), 'STDIN'
-    elif infile[-4:].upper() == '.SAM': sam_format, fin = True, os.popen('%ssamtools view -XS %s' % (options.sam_path, infile)) 
-    elif infile[-4:].upper() == '.BAM': sam_format, fin = True, os.popen('%ssamtools view -X %s' % (options.sam_path, infile))
+    if infile.strip() == '-': sam_format, fin, infile = True, os.popen('%ssamtools view -Sh -' % options.sam_path), 'STDIN'
+    elif infile[-4:].upper() == '.SAM': sam_format, fin = True, os.popen('%ssamtools view -S %s' % (options.sam_path, infile)) 
+    elif infile[-4:].upper() == '.BAM': sam_format, fin = True, os.popen('%ssamtools view %s' % (options.sam_path, infile))
     else: sam_format, fin = False, open(infile)
     disp('reading %s ...' % infile)
     if len(options.alignfile) > 0: pout = os.popen('%ssamtools view -bS - > %s' % (options.sam_path, options.alignfile), 'w')
