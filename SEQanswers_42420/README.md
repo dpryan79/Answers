@@ -1,0 +1,3 @@
+In reference to http://seqanswers.com/forums/showthread.php?t=42420
+
+Not infrequently, people ask about converting counts per gene to RPKM. To do so, of course, one needs a gene length value and most people find this difficult to come by. The following R script shows how to read in a GTF file and parse it using a reference fasta file to produce union gene model lengths and per-gene GC percentages. The latter isn't what's being asked for, but it's useful for use with the CQN (conditional quantil normalization), for which this script was originally written. The GTF and FASTA lines will need to be replaced as appropriate.
