@@ -10,7 +10,7 @@ int convert(htsFile *of, htsFile *fp, bam_hdr_t *hdr) {
     uint8_t *QUAL;
     int i;
 
-    while(sam_read1(fp, hdr, b) > 0) {
+    while(sam_read1(fp, hdr, b) >= 0) {
         QUAL = bam_get_qual(b);
         if(*QUAL != 0xFF) {
             for(i=0; i<b->core.l_qseq; i++) {
