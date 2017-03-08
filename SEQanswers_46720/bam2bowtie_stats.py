@@ -14,11 +14,7 @@ total = 0
 unpaired = 0
 mapped = 0
 multimap = 0
-while 1 :
-    try :
-        read = f.next()
-    except :
-        break
+for read in f.fetch():
     total += 1
     if(read.flag & 1 == 0) :
         unpaired += 1
