@@ -48,7 +48,7 @@ def revComp(s):
 
 def storeInBuffer(b, buf):
     s = b.query_sequence
-    q = b.query_qualities.tostring()
+    q = ''.join([chr(c+33) for c in b.query_qualities])
     if b.is_read1:
         rNum = 1
     else:
@@ -66,18 +66,18 @@ def dumpAlignments(b, buf, of1, of2):
     of = of1
     if b2[2] == 2:
         of = of2
-    of.write("@{}\n{}\n+{}\n".format(b.query_name, b2[0], b2[1]))
+    of.write("@{}\n{}\n+\n{}\n".format(b.query_name, b2[0], b2[1]))
     
     # Write the read
     s = b.query_sequence
-    q = b.query_qualities.tostring()
+    q = ''.join([chr(c+33) for c in b.query_qualities])
     if b.is_reverse:
         s = revComp(s)
         q = q[::-1]
     of = of1
     if b.is_read2:
         of = of2
-    of.write("@{}\n{}\n+{}\n".format(b.query_name, s, q))
+    of.write("@{}\n{}\n+\n{}\n".format(b.query_name, s, q))
 
     # Remove from the buffer
     del buf[b.query_name]
