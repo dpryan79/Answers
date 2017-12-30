@@ -1,0 +1,1 @@
+This was written in response to [this question on the bioinfo stack exchange](https://bioinformatics.stackexchange.com/questions/3181/generate-missing-5utr-and-3utr-information). In short, it'll take a GFF3 that's missing UTR entries and add them.
